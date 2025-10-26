@@ -123,14 +123,6 @@ it can be loaded directly."
            (cl-mapcar (lambda (x y) (+ (* alpha x) (* (- 1 alpha) y)))
                       rgb1 rgb2))))
 
-(defun doom-wallust--lighten (color amount)
-  "Lighten COLOR by AMOUNT (0-1)."
-  (doom-wallust--blend color "#ffffff" amount))
-
-(defun doom-wallust--darken (color amount)
-  "Darken COLOR by AMOUNT (0-1)."
-  (doom-wallust--blend color "#000000" amount))
-
 (defun doom-wallust--apply-theme (palette)
   "Apply PALETTE to the `doom-wallust' theme."
   (let* ((bg (doom-wallust--require-color palette 'background))
@@ -144,14 +136,13 @@ it can be loaded directly."
          (magenta (doom-wallust--require-color palette 'color5))
          (cyan (doom-wallust--require-color palette 'color6))
          (white (doom-wallust--require-color palette 'color7))
-         (bright-black (doom-wallust--require-color palette 'color8))
-         (bright-red (doom-wallust--require-color palette 'color9))
-         (bright-green (doom-wallust--require-color palette 'color10))
-         (bright-yellow (doom-wallust--require-color palette 'color11))
-         (bright-blue (doom-wallust--require-color palette 'color12))
-         (bright-magenta (doom-wallust--require-color palette 'color13))
-         (bright-cyan (doom-wallust--require-color palette 'color14))
-         (bright-white (doom-wallust--require-color palette 'color15))
+         ;; (bright-black (doom-lighten black 0.5))
+         ;; (bright-red (doom-lighten red 0.5))
+         ;; (bright-green (doom-lighten green 0.5))
+         (bright-yellow (doom-lighten yellow 0.5))
+         (bright-blue (doom-lighten blue 0.5))
+         (bright-magenta (doom-lighten magenta 0.5))
+         (bright-cyan (doom-lighten cyan 0.5))
          (bg-alt (doom-wallust--require-color palette 'bg-alt))
          (fg-alt (doom-wallust--require-color palette 'fg-alt))
          (base0 (doom-wallust--require-color palette 'base0))
@@ -163,63 +154,48 @@ it can be loaded directly."
          (base6 (doom-wallust--require-color palette 'base6))
          (base7 (doom-wallust--require-color palette 'base7))
          (base8 (doom-wallust--require-color palette 'base8))
-         (selection (doom-wallust--require-color palette 'selection))
-         (line (doom-wallust--require-color palette 'line))
-         (comment (doom-wallust--require-color palette 'comment))
-         (doc (doom-wallust--require-color palette 'doc))
-         (teal green)
-         (orange red)
-         (dark-blue (doom-wallust--darken blue 0.2))
-         (violet (doom-wallust--darken magenta 0.2))
-         (dark-cyan (doom-wallust--darken cyan 0.2))
+         (selection (doom-wallust--require-color palette 'color8))
+         (line (doom-wallust--require-color palette 'base2))
+         (comment (doom-wallust--require-color palette 'color10))
+         (doc (doom-wallust--require-color palette 'color11))
+         (teal (doom-wallust--require-color palette 'color14))
+         (orange (doom-lighten red 0.2))
+         (dark-blue (doom-darken blue 0.2))
+         (violet (doom-wallust--require-color palette 'color12))
+         (dark-cyan (doom-darken cyan 0.2))
          (grey base4)
-         (comments (if doom-wallust-brighter-comments dark-cyan comment))
-         (doc-comments (if doom-wallust-brighter-comments
-                           (doom-wallust--lighten dark-cyan 0.15)
-                         (doom-wallust--lighten doc 0.15)))
-         (modeline-pad (when doom-wallust-padded-modeline
-                         (if (integerp doom-wallust-padded-modeline)
-                             doom-wallust-padded-modeline
-                           4)))
+         (comments comment)
+         (doc-comments (doom-lighten doc 0.15))
          (modeline-fg fg)
-         (modeline-fg-alt (doom-wallust--blend blue grey
-                                               (if doom-wallust-brighter-modeline 0.4 0.08)))
-         (modeline-bg (if doom-wallust-brighter-modeline bg-alt line))
-         (modeline-bg-inactive (doom-wallust--darken bg 0.2))
-         (modeline-bg-l (if doom-wallust-brighter-modeline
-                            modeline-bg
-                          (doom-wallust--darken bg 0.1)))
-         (modeline-bg-inactive-l (doom-wallust--darken bg-alt 0.1)))
-         )
+         (modeline-fg-alt base7)
+         (modeline-bg line)
+         (modeline-bg-inactive (doom-darken bg 0.2))
+         (modeline-bg-l (doom-darken bg 0.1))
+         (modeline-bg-inactive-l (doom-darken bg-alt 0.1)))
     (custom-theme-set-faces
      'doom-wallust
-     `(default ((t (:background ,bg :foreground ,fg))))
+     `(default ((t (:background ,bg :foreground , fg))))
      `(cursor ((t (:background ,cursor))))
      `(fringe ((t (:background ,bg))))
      `(region ((t (:background ,selection :distant-foreground ,fg))))
-     `(highlight ((t (:background ,selection))))
+     `(highlight ((t (:background ,base1))))
      `(shadow ((t (:foreground ,comments))))
      `(minibuffer-prompt ((t (:foreground ,blue :weight bold))))
      `(vertical-border ((t (:foreground ,base0))))
      `(link ((t (:foreground ,blue :underline t))))
-     `(mode-line ((t (:background ,modeline-bg :foreground ,modeline-fg
-                       :box ,(when modeline-pad `(:line-width ,modeline-pad :color ,modeline-bg))))))
-     `(mode-line-inactive ((t (:background ,modeline-bg-inactive :foreground ,modeline-fg-alt
-                                :box ,(when modeline-pad `(:line-width ,modeline-pad :color ,modeline-bg-inactive))))))
-     `(mode-line-emphasis ((t (:foreground ,(if doom-wallust-brighter-modeline base8 blue)))))
+     `(mode-line ((t (:background ,modeline-bg :foreground ,modeline-fg))))
+     `(mode-line-inactive ((t (:background ,modeline-bg-inactive :foreground ,modeline-fg-alt))))
      `(header-line ((t (:background ,bg-alt :foreground ,fg))))
      `(solaire-mode-line-face ((t (:inherit mode-line :background ,modeline-bg-l))))
      `(solaire-mode-line-inactive-face ((t (:inherit mode-line-inactive :background ,modeline-bg-inactive-l))))
      `(font-lock-builtin-face ((t (:foreground ,magenta))))
-     `(font-lock-comment-face ((t (:foreground ,comments :slant italic
-                                    ,@(when doom-wallust-comment-bg
-                                        `(:background ,(doom-wallust--darken bg-alt 0.095)))))))
+     `(font-lock-comment-face ((t (:foreground ,fg-alt))))
      `(font-lock-comment-delimiter-face ((t (:inherit font-lock-comment-face))))
-     `(font-lock-constant-face ((t (:foreground ,yellow))))
+     `(font-lock-constant-face ((t (:foreground ,cyan))))
      `(font-lock-doc-face ((t (:foreground ,doc-comments :slant italic))))
      `(font-lock-function-name-face ((t (:foreground ,blue))))
      `(font-lock-keyword-face ((t (:foreground ,red :weight semi-bold))))
-     `(font-lock-string-face ((t (:foreground ,green))))
+     `(font-lock-string-face ((t (:foreground , teal))))
      `(font-lock-type-face ((t (:foreground ,cyan))))
      `(font-lock-variable-name-face ((t (:foreground ,violet))))
      `(font-lock-warning-face ((t (:foreground ,bright-yellow :weight bold))))
@@ -229,7 +205,6 @@ it can be loaded directly."
      `(show-paren-match ((t (:background ,bright-blue :foreground ,bg :weight bold))))
      `(line-number ((t (:foreground ,comment :background ,bg))))
      `(line-number-current-line ((t (:foreground ,blue :background ,bg :weight bold))))
-     `(hl-line ((t (:background ,base1))))
      `(org-level-1 ((t (:foreground ,blue :weight semi-bold :height 1.1))))
      `(org-level-2 ((t (:foreground ,magenta :weight semi-bold))))
      `(org-level-3 ((t (:foreground ,yellow :weight semi-bold))))
@@ -292,15 +267,15 @@ it can be loaded directly."
      `(ansi-color-magenta ((t (:foreground ,magenta))))
      `(ansi-color-cyan ((t (:foreground ,cyan))))
      `(ansi-color-white ((t (:foreground ,white))))
-     `(doom-modeline-bar ((t (:background ,(if doom-wallust-brighter-modeline modeline-bg blue)))))
-     `(doom-modeline-buffer-path ((t (:foreground ,(if doom-wallust-brighter-modeline base8 blue) :weight bold))))
+     `(doom-modeline-bar ((t (:background , blue)))))
+     `(doom-modeline-buffer-path ((t (:foreground , blue :weight bold))))
      `(doom-modeline-buffer-project-root ((t (:foreground ,teal :weight bold))))
      `(whitespace-empty ((t (:background ,base2))))
      `(css-proprietary-property ((t (:foreground ,orange))))
      `(css-property ((t (:foreground ,green))))
      `(css-selector ((t (:foreground ,blue))))
      `(org-link ((t (:foreground ,blue :underline t))))
-     `(org-date ((t (:foreground ,teal :underline nil)))))
+     `(org-date ((t (:foreground ,teal :underline nil))))
     (custom-theme-set-variables
      'doom-wallust
      `(ansi-color-names-vector [,black ,red ,green ,yellow ,blue ,magenta ,cyan ,white])
@@ -345,7 +320,7 @@ With prefix, prompt for FILE.  When QUIET is non-nil suppress status messages."
 
 ;;;###autoload
 (defun doom-wallust-start-watching (&optional file)
-  "Watch FILE (or `doom-wallust-palette-file') and reload on changes."
+  "Watch FILE (or `doom-wallust-palette-file') and reload on change."
   (interactive
    (list (when current-prefix-arg
            (read-file-name "Watch palette file: "
